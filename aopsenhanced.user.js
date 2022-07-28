@@ -18,7 +18,7 @@ AoPS.Enhanced = function(){
     //Activity & Attrbitues
     AoPS.Enhanced.model = Object;
     AoPS.Enhanced.model.attributes = {
-        "version": "9.0.0",
+        "version": "9.1.0",
         "author": "A_MatheMagician",
         "name": "AoPS Enhanced Beta",
         "match": "https://artofproblemsolving.com/*",
@@ -203,7 +203,7 @@ AoPS.Enhanced = function(){
             var url="https://aops-enhanced.akslolcoding.repl.co/collect/user";
             $.post(url, data).then((resp2)=>{
                 if (resp2.update){
-                    alert("AoPS Enhanced has a new update. Please <a href='https://github.com/AksLolCoding/AoPS-Enhanced-Beta/raw/main/aopsenhanced.user.js'>update</a> to the latest version.");
+                    setTimeout(()=>{alert("AoPS Enhanced has a new update. Please <a href='https://github.com/AksLolCoding/AoPS-Enhanced-Beta/raw/main/aopsenhanced.user.js'>update</a> to the latest version.");},2000);
                 }
             });
         });
