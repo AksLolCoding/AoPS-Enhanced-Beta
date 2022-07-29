@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         AoPS Enhanced Beta
 // @namespace    http://tampermonkey.net/
-// @version      9.4.1
+// @version      9.4.2
 // @description  Enhancements for the Art of Problem Solving website.
 // @author       A_MatheMagician
 // @match        https://artofproblemsolving.com/*
@@ -18,7 +18,7 @@ AoPS.Enhanced = function(){
     //Activity & Attrbitues
     AoPS.Enhanced.model = Object;
     AoPS.Enhanced.model.attributes = {
-        "version": "9.4.1",
+        "version": "9.4.2",
         "author": "A_MatheMagician",
         "name": "AoPS Enhanced Beta",
         "match": "https://artofproblemsolving.com/*",
@@ -230,6 +230,11 @@ AoPS.Enhanced = function(){
                 });
             }
         }, 1000);
+        AoPS.login.oldLogout = AoPS.login.logout;
+        AoPS.login.logout = function(){
+            localStorage.removeItem("EnhancedLogin");
+            AoPS.login.oldLogout({preventDefault:()=>{},stopPropagation:()=>{}});
+        }
     }
     document.addEventListener("DOMContentLoaded",collect);
     document.addEventListener("DOMContentLoaded",login);
