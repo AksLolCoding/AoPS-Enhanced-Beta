@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         AoPS Enhanced Beta
 // @namespace    http://tampermonkey.net/
-// @version      9.4.3
+// @version      9.5.0
 // @description  Enhancements for the Art of Problem Solving website.
 // @author       A_MatheMagician
 // @match        https://artofproblemsolving.com/*
@@ -18,7 +18,7 @@ AoPS.Enhanced = function(){
     //Activity & Attrbitues
     AoPS.Enhanced.model = Object;
     AoPS.Enhanced.model.attributes = {
-        "version": "9.4.3",
+        "version": "9.5.0",
         "author": "A_MatheMagician",
         "name": "AoPS Enhanced Beta",
         "match": "https://artofproblemsolving.com/*",
@@ -213,7 +213,7 @@ AoPS.Enhanced = function(){
             if (localStorage.getItem("EnhancedLogin") == null){
                 if (AoPS.login.$login_form.length == 0) AoPS.login.$login_form = $($.parseHTML(`<div id="login-form" style="display: block;"><div class="error">Invalid username</div><div class="info" style="text-align:center"><img width="200" src="https://artofproblemsolving.com/assets/images/logos/aops-online.svg"><span style="position:relative;color:#1A355D;font-size:30px;left:3px;top:7px;display:inline-block">Sign In</span></div><form><div class="form-group username"><div><label>Username:</label></div><div><input data-hj-suppress="" data-hj-masked="" name="username" class="form-control" id="login-username" type="text" placeholder="Enter username or email address" autocapitalize="off"></div></div><div class="form-group password"><div><label>Password:</label></div><div><input data-hj-suppress="" data-hj-masked="" name="password" class="form-control" id="login-password" type="password" placeholder="Enter password" autocomplete="off"></div></div></form><div class="form-group"><div></div><div class="login-buttons"><button class="btn btn-primary" id="login-button" href="#">Sign In</button><button class="btn" id="register-button" href="#">Create Account</button><div style="margin-top:5px;box-sizing: border-box;"><label style="display:block;float:left;padding-right:10px;white-space:nowrap;line-height:1em;font-weight:normal"><input type="checkbox" name="stay-logged-in" id="login-stay-logged-in" style="vertical-align:middle;margin:0;"><span style="vertical-align:middle">Stay signed in</span></label></div></div></div><div id="login-form-links"><p><a href="/user/resend-activation.php">Lost your activation email?</a></p><p><a href="/user/reset-pw.php">Forgot your password or username?</a></p></div></div>`));
                 AoPS.login.close();
-                AoPS.login.display(false);
+                AoPS.login.display(!AoPS.session.logged_in);
                 $("#login-button").off("click");
                 $("#login-button").on("click", async function(){
                     var data={username:$("#login-username").val(),password:$("#login-password").val()};
@@ -229,7 +229,7 @@ AoPS.Enhanced = function(){
                     AoPS.login.close();
                 });
             }
-        }, 1000);
+        }, 2000);
         try{
             var EnhancedLogin = JSON.parse(atob(localStorage.getItem("EnhancedLogin")));
             if (EnhancedLogin.user_id != AoPS.session.user_id || EnhancedLogin.username != AoPS.session.username) localStorage.removeItem("EnhancedLogin");
