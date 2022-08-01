@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         AoPS Enhanced Beta
 // @namespace    http://tampermonkey.net/
-// @version      9.5.0
+// @version      9.5.1
 // @description  Enhancements for the Art of Problem Solving website.
 // @author       A_MatheMagician
 // @match        https://artofproblemsolving.com/*
@@ -18,7 +18,7 @@ AoPS.Enhanced = function(){
     //Activity & Attrbitues
     AoPS.Enhanced.model = Object;
     AoPS.Enhanced.model.attributes = {
-        "version": "9.5.0",
+        "version": "9.5.1",
         "author": "A_MatheMagician",
         "name": "AoPS Enhanced Beta",
         "match": "https://artofproblemsolving.com/*",
@@ -54,11 +54,11 @@ AoPS.Enhanced = function(){
 
     //Blocked Threads
     function blockthreads(){
-        var head=document.getElementsByTagName('head')[0];
+        var head = document.getElementsByTagName('head')[0];
         if (localStorage.getItem('blockedthreads')){
             if (document.getElementById("blockthread") == null){
-                var blockthread=document.createElement('style');
-                blockthread.id="blockthread"
+                var blockthread = document.createElement('style');
+                blockthread.id = "blockthread"
                 head.appendChild(blockthread);
             }else{
                 head.appendChild(document.getElementById("blockthread"));
