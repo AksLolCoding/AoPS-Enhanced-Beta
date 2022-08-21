@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         AoPS Enhanced Beta
 // @namespace    http://tampermonkey.net/
-// @version      9.5.1
+// @version      9.5.2
 // @description  Enhancements for the Art of Problem Solving website.
 // @author       A_MatheMagician
 // @match        https://artofproblemsolving.com/*
@@ -18,7 +18,7 @@ AoPS.Enhanced = function(){
     //Activity & Attrbitues
     AoPS.Enhanced.model = Object;
     AoPS.Enhanced.model.attributes = {
-        "version": "9.5.1",
+        "version": "9.5.2",
         "author": "A_MatheMagician",
         "name": "AoPS Enhanced Beta",
         "match": "https://artofproblemsolving.com/*",
@@ -312,6 +312,9 @@ AoPS.Enhanced = function(){
     document.addEventListener('keydown', function(e){AoPS.Enhanced.keys[e] = true;}, false);
     document.addEventListener('DOMContentLoaded', function(){
         try{AoPS.Enhanced.darkthemeupdate();}catch(e){};
+        //UI Fixes
+        if(location.pathname.includes('/hw'))window.scrolluifix=setInterval(()=>{if(Math.floor($(`a[name=problem${location.pathname.split('/hw')[1]}`)[0].getBoundingClientRect().top)==$("#header-wrapper")[0].clientHeight)clearInterval(window.scrolluifix);else window.scroll({top:$(`a[name=problem${location.pathname.split('/hw')[1]}`)[0].getBoundingClientRect().top-$("#header-wrapper")[0].clientHeight+window.scrollY,behavior:'smooth'});},100);
+        $('.round-dropdown').css('z-index','0');
 
         //Enhanced Effects
         AoPS.Enhanced.Effects = {};
