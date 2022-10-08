@@ -14,4 +14,5 @@ You must do this so that the script knows who you are. Once you sign in, you wil
 ### Copyright Notice
 Some of the code for this userscript comes from:
 - "AoPS Enhanced" by happycupcake [Copyright (c) 2019 epiccakeking]
-- artofproblemsolving.com
+- This is fork of "AoPS Enhanced" and some code is taken/modified
+- [Art of Problem Solving](https://artofproblemsolving.com)
