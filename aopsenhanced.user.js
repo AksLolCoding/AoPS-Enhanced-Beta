@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         AoPS Enhanced Beta
 // @namespace    http://tampermonkey.net/
-// @version      9.5.2
+// @version      10.0.0
 // @description  Enhancements for the Art of Problem Solving website.
 // @author       A_MatheMagician
 // @match        https://artofproblemsolving.com/*
@@ -18,7 +18,7 @@ AoPS.Enhanced = function(){
     //Activity & Attrbitues
     AoPS.Enhanced.model = Object;
     AoPS.Enhanced.model.attributes = {
-        "version": "9.5.2",
+        "version": "10.0.0",
         "author": "A_MatheMagician",
         "name": "AoPS Enhanced Beta",
         "match": "https://artofproblemsolving.com/*",
@@ -232,13 +232,148 @@ AoPS.Enhanced = function(){
         }, 2000);
         try{
             var EnhancedLogin = JSON.parse(atob(localStorage.getItem("EnhancedLogin")));
-            if (EnhancedLogin.user_id != AoPS.session.user_id || EnhancedLogin.username != AoPS.session.username) localStorage.removeItem("EnhancedLogin");
+            if (AoPS.session.logged_in) if (EnhancedLogin.user_id != AoPS.session.user_id || EnhancedLogin.username != AoPS.session.username) localStorage.removeItem("EnhancedLogin");
         } catch(e){
             localStorage.removeItem("EnhancedLogin");
         }
     }
     document.addEventListener("DOMContentLoaded",collect);
     document.addEventListener("DOMContentLoaded",login);
+
+    //Tutorial
+    AoPS.Enhanced.tutorial = {
+        stages: 6,
+        stage: function(){
+            try{
+                var stage = JSON.parse(localStorage.getItem("EnhancedTutorial"));
+                if (stage == null || stage == undefined) return 0;
+                else return stage;
+            } catch(e){return 0}
+        },
+        show: function(){
+            var stage = AoPS.Enhanced.tutorial.stage();
+            if (stage >= AoPS.Enhanced.tutorial.stages) return;
+            switch (stage){
+                case 0:
+                    AoPS.Ui.Modal.show({
+                        title: "AoPS Enhanced Tutorial",
+                        body: `<p>Thanks for using AoPS Enhanced! This short tutorial will teach you how to use the<br>userscript.</p>`,
+                        frame_class: "aops-modal-standard",
+                        closeX: false,
+                        force_response: true,
+                        scrollable: false,
+                        type: "buttons",
+                        buttons: [{text: "Next", value: stage}],
+                        onButtonClick: AoPS.Enhanced.tutorial.next,
+                    }); break;
+                case 1:
+                    if (location.pathname== '/enhanced' || location.pathname=='/enhanced/'){
+                        localStorage.setItem("EnhancedTutorial", JSON.stringify(2));
+                        setTimeout(AoPS.Enhanced.tutorial.show, 100);
+                        break;
+                    }
+                    AoPS.Enhanced.tutorial.reset(2);
+                    $("#header").append(`<div class="aops-header-mask" style="width: 100%; height: 100%; position: absolute; display: block; opacity: 0; background-color: #000000; transition: opacity 0.3s ease;"></div>`);
+                    $(".aops-header-mask").css("opacity", "0.4");
+                    $("#header").css("z-index", "101001");
+                    $(".menubar-label.resources").css("z-index", "102001");
+                    $(".menubar-label.resources > .menubar-label-link-outer").css("z-index", "102002");
+                    $(".menubar-label.resources > .menubar-label-link-outer").css("background-color", "white");
+                    AoPS.Ui.Modal.show({
+                        title: "AoPS Enhanced Tutorial",
+                        body: `<p>To access the script's features, hover over the "Resources" tab and click "AoPS Enhanced".</p>`,
+                        frame_class: "aops-modal-standard",
+                        closeX: false,
+                        force_response: true,
+                        scrollable: false,
+                        type: "buttons",
+                        buttons: [{text: "Go to AoPS Enhanced", value: stage}],
+                        onButtonClick: (stage) => {
+                            location.href = '/enhanced';
+                        },
+                    }); break;
+                case 2:
+                    if (!(location.pathname== '/enhanced' || location.pathname=='/enhanced/')){
+                        AoPS.Enhanced.tutorial.reset();
+                        setTimeout(AoPS.Enhanced.tutorial.show, 100);
+                        break;
+                    }
+                    AoPS.Ui.Modal.show({
+                        title: "AoPS Enhanced Tutorial - Main Page",
+                        body: `<p>This is the AoPS Enhanced page! Here, you can access Tools (These are being tested),<br>Settings, and Backup (AoPS Enhanced Fail is coming soon).</p>`,
+                        frame_class: "aops-modal-standard",
+                        closeX: false,
+                        force_response: true,
+                        scrollable: false,
+                        type: "buttons",
+                        buttons: [{text: "Next", value: stage}],
+                        onButtonClick: AoPS.Enhanced.tutorial.next,
+                    }); break;
+                case 3:
+                    if (!(location.pathname== '/enhanced' || location.pathname=='/enhanced/')){
+                        AoPS.Enhanced.tutorial.reset();
+                        setTimeout(AoPS.Enhanced.tutorial.show, 100);
+                        break;
+                    }
+                    AoPS.Ui.Modal.show({
+                        title: "AoPS Enhanced Tutorial - Main Page",
+                        body: `<p>First, let's go through the Settings page. You can get there by clicking on<br>"Settings | AoPS Enhanced "under the "Settings" header. Click the button<br>below to go to thispage.</p>`,
+                        frame_class: "aops-modal-standard",
+                        closeX: false,
+                        force_response: true,
+                        scrollable: false,
+                        type: "buttons",
+                        buttons: [{text: "Go to Settings", value: stage}],
+                        onButtonClick: (stage) => {
+                            localStorage.setItem("EnhancedTutorial", JSON.stringify(4));
+                            location.href = '/enhanced/settings';
+                        },
+                    }); break;
+                case 4:
+                    if (!(location.pathname== '/enhanced/settings' || location.pathname=='/enhanced/settings')){
+                        AoPS.Enhanced.tutorial.reset(2);
+                        setTimeout(AoPS.Enhanced.tutorial.show, 100);
+                        break;
+                    }
+                    AoPS.Ui.Modal.show({
+                        title: "AoPS Enhanced Tutorial - Settings",
+                        body: `<p>Welcome to the Settings page! Here, you can adjust the settings to fit your<br>needs. To view information about any setting, click on the <span class="aops-font">3</span> icon next to any<br>header.</p>`,
+                        frame_class: "aops-modal-standard",
+                        closeX: false,
+                        force_response: true,
+                        scrollable: false,
+                        type: "buttons",
+                        buttons: [{text: "Next", value: stage}],
+                        onButtonClick: AoPS.Enhanced.tutorial.next,
+                    }); break;
+                case 5:
+                    AoPS.Ui.Modal.show({
+                        title: "AoPS Enhanced Tutorial - Ending",
+                        body: `<p>That's it for this tutorial! This tutorial will continue when more features are added.</p>`,
+                        frame_class: "aops-modal-standard",
+                        closeX: false,
+                        force_response: true,
+                        scrollable: false,
+                        type: "buttons",
+                        buttons: [{text: "Next", value: stage}],
+                        onButtonClick: AoPS.Enhanced.tutorial.next,
+                    }); break;
+            }
+        },
+        next: function(stage){
+            if (!stage) stage = AoPS.Enhanced.tutorial.stage();
+            if (stage >= AoPS.Enhanced.tutorial.stages) return;
+            else stage++;
+            localStorage.setItem("EnhancedTutorial", JSON.stringify(stage));
+            AoPS.Ui.Modal.closeTopModal();
+            setTimeout(AoPS.Enhanced.tutorial.show, 10);
+        },
+        reset: function(stage){
+            if (!stage) localStorage.removeItem("EnhancedTutorial");
+            else localStorage.setItem("EnhancedTutorial", JSON.stringify(stage));
+        },
+    };
+    document.addEventListener("DOMContentLoaded",AoPS.Enhanced.tutorial.show);
 
     //Time
     AoPS.Enhanced.Time = (()=>{
@@ -433,7 +568,7 @@ AoPS.Enhanced = function(){
             document.title="Settings | AoPS Enhanced";
             $('#main-column-standard')[0].innerHTML=`<h1>Settings | <a href='/enhanced' style="color:#1b365d;">AoPS Enhanced</a></h1>
 <div class="aops-panel">
-    <h2>Community</h2>
+    <h2>Community <span class="aops-font info-icon" onclick="AoPS.Enhanced.showDetails('Settings');">3</span></h2>
         <h3>Enhanced Quotes</h3>
             <label><input type="checkbox" id="enhancedquote" onclick="localStorage.setItem('enhancedquote', JSON.stringify(this.checked)); AoPS.Ui.Flyout.display('Changes Saved');"/> Use Enhanced Quotes</label><br>
             <label><input type="checkbox" id="enhancedquotetip" onclick="localStorage.setItem('enhancedquotetip', JSON.stringify(this.checked)); AoPS.Ui.Flyout.display('Changes Saved');"/> Use tip with avatar when using Enhanced Quotes</label><br>
@@ -450,7 +585,7 @@ AoPS.Enhanced = function(){
             <label><input type="checkbox" id="cmty-block" onclick="localStorage.setItem('cmty-block', JSON.stringify(this.checked)); AoPS.Ui.Flyout.display('Changes Saved');"/> Block Community (this disables viewing the feed, forums, blogs, and profiles)</label><br>
 </div>
 <div class="aops-panel">
-    <h2>Dark Mode</h2>
+    <h2>Dark Mode <span class="aops-font info-icon" onclick="AoPS.Enhanced.showDetails('Dark Mode');">3</span></h2>
         <p>Use these options to toggle dark mode. Try toggling compatibility mode if things do not work. Options autosave.</p>
         <label><input type="checkbox" id="darktheme" onclick="localStorage.setItem('darktheme', JSON.stringify(this.checked)); AoPS.Ui.Flyout.display('Changes Saved');AoPS.Enhanced.theme.update();"/> Enable dark mode</label><br>
         <label><input type="checkbox" id="darkthemecompat" onclick="localStorage.setItem('darkthemecompat', JSON.stringify(this.checked)); AoPS.Ui.Flyout.display('Changes Saved');AoPS.Enhanced.theme.update();"/> Dark mode compatibility mode (Use if things are still light)</label><br><br>
@@ -460,7 +595,7 @@ AoPS.Enhanced = function(){
         <label><input type="number" class="form-control" style="display:unset;width:auto;height:25px;padding:0px 2px;font-size:16px;color:black;" onkeydown="javascript: return ['Backspace','Delete','ArrowLeft','ArrowRight'].includes(event.code) ? true : !isNaN(Number(event.key)) && event.code!=='Space'" min='0' max='12' id="darkend" onchange="localStorage.setItem('darkend', JSON.stringify(this.value)); AoPS.Ui.Flyout.display('Changes Saved');"/> Ending hour (AM)</label><br>
 </div>
 <div class="aops-panel">
-    <h2>Keyboard Shortcuts</h2>
+    <h2>Keyboard Shortcuts <span class="aops-font info-icon" onclick="AoPS.Enhanced.showDetails('Shortcuts');">3</span></h2>
         <p>Quick Reply <select id="shortcuts-quickrep" onchange="localStorage.setItem('shortcuts-quickrep', JSON.stringify(this.value)); AoPS.Ui.Flyout.display('Changes Saved');"/><option>None</option><option>a</option><option>b</option><option>c</option><option>d</option><option>e</option><option>f</option><option>g</option><option>h</option><option>i</option><option>j</option><option>k</option><option>l</option><option>m</option><option>n</option><option>o</option><option>p</option><option>q</option><option>r</option><option>s</option><option>t</option><option>u</option><option>v</option><option>w</option><option>x</option><option>y</option><option>z</option></select><br></p>
         <p>Scroll to Top <select id="shortcuts-scrollup" onchange="localStorage.setItem('shortcuts-scrollup', JSON.stringify(this.value)); AoPS.Ui.Flyout.display('Changes Saved');"/><option>None</option><option>a</option><option>b</option><option>c</option><option>d</option><option>e</option><option>f</option><option>g</option><option>h</option><option>i</option><option>j</option><option>k</option><option>l</option><option>m</option><option>n</option><option>o</option><option>p</option><option>q</option><option>r</option><option>s</option><option>t</option><option>u</option><option>v</option><option>w</option><option>x</option><option>y</option><option>z</option></select><br>
         <p>Scroll to Bottom <select id="shortcuts-scrolldown" onchange="localStorage.setItem('shortcuts-scrolldown', JSON.stringify(this.value)); AoPS.Ui.Flyout.display('Changes Saved');"/><option>None</option><option>a</option><option>b</option><option>c</option><option>d</option><option>e</option><option>f</option><option>g</option><option>h</option><option>i</option><option>j</option><option>k</option><option>l</option><option>m</option><option>n</option><option>o</option><option>p</option><option>q</option><option>r</option><option>s</option><option>t</option><option>u</option><option>v</option><option>w</option><option>x</option><option>y</option><option>z</option></select><br>
@@ -484,7 +619,48 @@ input[type=number], input[type=number]:focus{
 }
 select{
     border: 1px solid #1b365d;
+}
+.info-icon:hover{
+    cursor: pointer;
 }</style>`;
+            AoPS.Enhanced.showDetails = (topic) => {
+                switch (topic.toLowerCase()){
+                    case "settings":
+                        AoPS.Ui.Modal.show({
+                            title: "AoPS Enhanced Settings - Community",
+                            body: `<p>The "Community" header contains the following settings for the community:
+                        <h4>Enhanced Quotes</h4>Enhanced Quotes are a new type of advanced quote. You can<br>choose to enable/disable them, use tips with the user's avatar,<br>and if relative timestamps (today, tommorow, ect.) should be used.
+                        <h4>Blocked Threads</h4>This setting will block all threads with the given names,on<br>all forums.
+                        <h4>Custom Autotags</h4>This feature allows you to automatically add tags to a new<br>forum if the trigger text is in the first post.
+                        <h4>Community Controls</h4>These allow you to disable or restrict certain parts of the<br>community, including the feed. You should use these if<br>you want to avoid getting distracted.</p>`,
+                            frame_class: "aops-modal-standard",
+                            closeX: false,
+                            scrollable: false,
+                            type: "alert",
+                        }); break;
+                    case "dark mode":
+                        AoPS.Ui.Modal.show({
+                            title: "AoPS Enhanced Settings - Dark Mode",
+                            body: `<p>The "Dark Mode" header contains the following settings for the community:
+                        <h4>Dark Mode</h4>Enables dark mode. This setting applies to all pages on the site.
+                        <h4>Compatibility Mode</h4>Use compatibility mode of Dark Mode is not working.
+                        <h4>Dark Mode Schedule</h4>This allows you to only use dark mode during certain customizable<br>hours.`,
+                            frame_class: "aops-modal-standard",
+                            closeX: false,
+                            scrollable: false,
+                            type: "alert",
+                        }); break;
+                    case "shortcuts":
+                        AoPS.Ui.Modal.show({
+                            title: "AoPS Enhanced Settings - Keyboard Shortcuts",
+                            body: `<p>The "Keyboard Shortcuts" header allows you to set keyboard shortcuts to make doing certain<br>tasks in the community. Leave blank if you do not want to use them.`,
+                            frame_class: "aops-modal-standard",
+                            closeX: false,
+                            scrollable: false,
+                            type: "alert",
+                        }); break;
+                }
+            };
             document.getElementById("enhancedcustomautotag").value=localStorage.getItem("customautotags");
             document.getElementById("darktheme").checked=JSON.parse(localStorage.getItem("darktheme"));
             document.getElementById("darkthemecompat").checked=JSON.parse(localStorage.getItem("darkthemecompat"));
